@@ -59,6 +59,7 @@ _zsh_nvm_load() {
         ;;
       'use')
         _zsh_nvm_nvm "$@"
+        export NVM_CURRENT_VERSION="$(nvm version)"
         export NVM_AUTO_USE_ACTIVE=false
         ;;
       'install' | 'i')
@@ -165,7 +166,6 @@ autoload -U add-zsh-hook
 _zsh_nvm_auto_use() {
   _zsh_nvm_has nvm_find_nvmrc || return
 
-  local node_version="$(nvm version)"
   local nvmrc_path="$(nvm_find_nvmrc)"
 
   # cache default version for this session
@@ -178,10 +178,10 @@ _zsh_nvm_auto_use() {
 
     if [[ "$nvmrc_node_version" = "N/A" ]]; then
       nvm install && export NVM_AUTO_USE_ACTIVE=true
-    elif [[ "$nvmrc_node_version" != "$node_version" ]]; then
+    elif [[ "$nvmrc_node_version" != "$NVM_CURRENT_VERSION" ]]; then
       nvm use && export NVM_AUTO_USE_ACTIVE=true
     fi
-  elif [[ "$node_version" != "$NVM_DEFAULT_VERSION" ]] && [[ "$NVM_AUTO_USE_ACTIVE" = true ]]; then
+  elif [[ "$NVM_CURRENT_VERSION" != "$NVM_DEFAULT_VERSION" ]] && [[ "$NVM_AUTO_USE_ACTIVE" = true ]]; then
     echo "Reverting to nvm default version"
     nvm use default
   fi
